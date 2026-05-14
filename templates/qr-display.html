@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Quét mã thanh toán</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/stylesheet/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="main-box">
+  <h4 class="text" id="main-title">Quét mã để thanh toán</h4>
+
+  <div class="checkout">
+    <div class="qr-body">
+
+      <!-- White wrapper — required for banking app QR scanners on dark backgrounds -->
+      <div class="qr-wrapper">
+        <div id="qrcode"></div>
+      </div>
+
+      <p class="text qr-amount">{{.Amount}} VND</p>
+      <p class="text qr-order-code">Mã đơn: #{{.OrderCode}}</p>
+
+      <p id="status-msg" class="text qr-status-msg">Đang chờ xác nhận thanh toán...</p>
+
+      <a href="/" class="text" id="return-page-btn">Huỷ thanh toán</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── 1. Render QR Code ────────────────────────────────────────────────────────
+  new QRCode(document.getElementById("qrcode"), {
+    text: "{{.QRText}}",
+    width: 250,
+    height: 250,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // ─── 2. Payment Status Polling ────────────────────────────────────────────────
+  // Polls every 3s purely for UX (redirecting the user on success).
+  // The backend webhook handler is the true source of record — not this page.
+  const ORDER_CODE = "{{.OrderCode}}";
+  const statusMsg  = document.getElementById("status-msg");
+  let   pollCount  = 0;
+  const MAX_POLLS  = 200; // 200 × 3s = 10 minutes (standard VietQR lifespan)
+
+  const intervalId = setInterval(async () => {
+    pollCount++;
+
+    // Hard stop after 10 minutes to prevent self-DDoS
+    if (pollCount >= MAX_POLLS) {
+      clearInterval(intervalId);
+      statusMsg.classList.add("error");
+      statusMsg.textContent = "Thời gian thanh toán đã hết, vui lòng tải lại trang.";
+      return;
+    }
+
+    try {
+      const res  = await fetch(`/api/check-status?orderId=${ORDER_CODE}`);
+      const data = await res.json();
+
+      if (data.status === "PAID") {
+        clearInterval(intervalId);
+        statusMsg.textContent = "Thanh toán thành công! Đang chuyển hướng...";
+        window.location.href = "/success/";
+        return;
+      }
+
+      if (data.status === "PARTIAL_PAYMENT_FRAUD") {
+        clearInterval(intervalId);
+        statusMsg.classList.add("error");
+        statusMsg.textContent = "Thanh toán không hợp lệ (Sai số tiền). Vui lòng liên hệ hỗ trợ.";
+        return;
+      }
+
+      // PENDING — continue polling silently
+    } catch (err) {
+      console.warn("Poll failed, retrying:", err);
+    }
+  }, 3000);
+</script>
+</body>
+</html>
