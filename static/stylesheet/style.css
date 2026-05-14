@@ -274,7 +274,7 @@ body {
         font-size: 1rem;
     }
 }
-}
+
 
 /* =========================================
    CHECKOUT FORM
@@ -375,31 +375,31 @@ body {
 }
 
 .popup-text-header {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--error-txt) !important;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--error-txt);
 }
 
 .popup-text {
-  font-family: "JetBrains Mono", monospace;
-  color: var(--highlight-txt) !important;
-  opacity: 0.8;
-  line-height: 1.5;
-  margin-bottom: 30px;
+    font-family: "JetBrains Mono", monospace;
+    color: var(--highlight-txt);
+    opacity: 0.8;
+    line-height: 1.5;
+    margin-bottom: 30px;
 }
 
 .popup-close-btn {
-  width: 100%;
-  background: var(--box-color);
-  border: 2px dotted var(--highlight-txt);
-  color: var(--primary-txt) !important;
-  border-radius: 8px;
-  padding: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: "JetBrains Mono", monospace;
+    width: 100%;
+    background: var(--box-color);
+    border: 2px dotted var(--highlight-txt);
+    color: var(--primary-txt);
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: "JetBrains Mono", monospace;
 }
 
 .popup-close-btn:hover {
