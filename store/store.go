@@ -21,6 +21,7 @@ type PaymentSession struct {
 	Status         PaymentStatus
 	CreatedAt      time.Time
 	ExpectedAmount int
+	MSSV           string
 }
 
 // PaymentStore is a thread-safe, TTL-managed in-memory store.
@@ -42,13 +43,14 @@ func NewPaymentStore() *PaymentStore {
 }
 
 // Set registers a new order in the store with PENDING status.
-func (ps *PaymentStore) Set(orderCode int64, expectedAmount int) {
+func (ps *PaymentStore) Set(orderCode int64, expectedAmount int, mssv string) {
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
 	ps.sessions[orderCode] = PaymentSession{
 		Status:         StatusPending,
 		CreatedAt:      time.Now(),
 		ExpectedAmount: expectedAmount,
+		MSSV:           mssv,
 	}
 }
 

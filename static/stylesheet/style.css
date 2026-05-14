@@ -7,7 +7,8 @@
     --primary-txt: #fe9841;
     --highlight-txt: #bbeae1;
     --box-highlight-color: #35778f;
-    --error-txt: #ff6b6b; /* NEW: A soft red for error messages */
+    --error-txt: #ff6b6b;
+    /* NEW: A soft red for error messages */
 }
 
 body {
@@ -16,7 +17,8 @@ body {
 }
 
 /* THE BASELINE: Everything gets this font and orange color by default */
-.text, #text {
+.text,
+#text {
     font-family: "JetBrains Mono", monospace;
     color: var(--primary-txt);
     margin: 8px 0;
@@ -48,6 +50,7 @@ body {
     font-size: 1.5rem;
     text-align: center;
 }
+
 #success-title {
     color: var(--highlight-txt);
     font-size: 1.5rem;
@@ -84,7 +87,8 @@ body {
 }
 
 /* Button & Link Styles (IDs naturally override .text) */
-#create-payment-link-btn, #return-page-btn {
+#create-payment-link-btn,
+#return-page-btn {
     display: block;
     width: 100%;
     box-sizing: border-box;
@@ -110,9 +114,11 @@ body {
 }
 
 /* Hover States */
-#create-payment-link-btn:hover, #return-page-btn:hover {
+#create-payment-link-btn:hover,
+#return-page-btn:hover {
     background-color: var(--box-highlight-color);
-    color: white; /* Naturally overrides the orange text color on hover */
+    color: white;
+    /* Naturally overrides the orange text color on hover */
 }
 
 
@@ -120,16 +126,37 @@ body {
    📱 MOBILE PHONES (Screens under 600px)
    ========================================= */
 @media (max-width: 600px) {
-    .checkout { width: 90vw; }
-    .product { padding: 12px 15px; }
-    .text { font-size: 0.95rem; }
+    .checkout {
+        width: 90vw;
+    }
 
-    #main-title, #success-title { font-size: 1.2rem; }
+    .product {
+        padding: 12px 15px;
+    }
 
-    .main-box p { padding: 0 15px; text-align: center; }
+    .text {
+        font-size: 0.95rem;
+    }
 
-    #create-payment-link-btn { height: 48px; font-size: 1rem; }
-    #return-page-btn { padding: 12px 20px; font-size: 1rem; }
+    #main-title,
+    #success-title {
+        font-size: 1.2rem;
+    }
+
+    .main-box p {
+        padding: 0 15px;
+        text-align: center;
+    }
+
+    #create-payment-link-btn {
+        height: 48px;
+        font-size: 1rem;
+    }
+
+    #return-page-btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
 }
 
 
@@ -137,11 +164,23 @@ body {
    🖥️ 2K / 4K MONITORS (Screens larger than 1440px)
    ========================================= */
 @media (min-width: 1440px) {
-    .checkout { width: 650px; border-radius: 12px; }
-    .product { padding: 25px 30px; }
-    .text { font-size: 1.25rem; }
+    .checkout {
+        width: 650px;
+        border-radius: 12px;
+    }
 
-    #main-title, #success-title { font-size: 2rem; }
+    .product {
+        padding: 25px 30px;
+    }
+
+    .text {
+        font-size: 1.25rem;
+    }
+
+    #main-title,
+    #success-title {
+        font-size: 2rem;
+    }
 
     #create-payment-link-btn {
         height: 60px;
@@ -150,7 +189,10 @@ body {
         border-bottom-right-radius: 12px;
     }
 
-    #return-page-btn { padding: 16px 30px; font-size: 1.3rem; }
+    #return-page-btn {
+        padding: 16px 30px;
+        font-size: 1.3rem;
+    }
 }
 
 
@@ -176,7 +218,8 @@ body {
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 24px;
-    line-height: 0; /* Eliminates phantom whitespace below the canvas */
+    line-height: 0;
+    /* Eliminates phantom whitespace below the canvas */
 }
 
 .qr-amount {
@@ -206,16 +249,182 @@ body {
    QR PAGE — MOBILE
    ========================================= */
 @media (max-width: 600px) {
-    .qr-amount   { font-size: 1rem; }
-    .qr-order-code { font-size: 0.8rem; }
+    .qr-amount {
+        font-size: 1rem;
+    }
+
+    .qr-order-code {
+        font-size: 0.8rem;
+    }
 }
 
 /* =========================================
    QR PAGE — 2K / 4K
    ========================================= */
 @media (min-width: 1440px) {
-    .qr-amount   { font-size: 1.5rem; }
-    .qr-order-code { font-size: 1.1rem; }
-    .qr-status-msg { font-size: 1rem; }
+    .qr-amount {
+        font-size: 1.5rem;
+    }
+
+    .qr-order-code {
+        font-size: 1.1rem;
+    }
+
+    .qr-status-msg {
+        font-size: 1rem;
+    }
 }
+}
+
+/* =========================================
+   CHECKOUT FORM
+   ========================================= */
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+    padding: 0 30px;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: var(--highlight-txt);
+    opacity: 0.8;
+}
+
+.input-group input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-group input:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--main-color);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(255, 127, 39, 0.15);
+}
+
+.input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 600px) {
+    .input-group {
+        padding: 0 20px;
+    }
+}
+
+/* =========================================
+   POPUP MODAL
+   ========================================= */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--box-color);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.popup-content {
+    background: var(--box-color);
+    border-radius: 16px;
+    padding: 32px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.popup-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.popup-icon {
+    font-size: 2.5rem;
+}
+
+.popup-text-header {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--error-txt) !important;
+}
+
+.popup-text {
+  font-family: "JetBrains Mono", monospace;
+  color: var(--highlight-txt) !important;
+  opacity: 0.8;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.popup-close-btn {
+  width: 100%;
+  background: var(--box-color);
+  border: 2px dotted var(--highlight-txt);
+  color: var(--primary-txt) !important;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.popup-close-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

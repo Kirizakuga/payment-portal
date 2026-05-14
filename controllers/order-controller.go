@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"payos-demo/config"
+	"payos-demo/lib/gsheets"
 	"payos-demo/store"
 	"strconv"
 	"time"
@@ -25,6 +26,10 @@ type OrderController struct {
 	Templates *template.Template
 }
 
+type IndexPageData struct {
+	Error string
+}
+
 // QRPageData is the data contract between Go and the qr-display.html template.
 type QRPageData struct {
 	QRText    string
@@ -32,9 +37,38 @@ type QRPageData struct {
 	OrderCode int64
 }
 
+// Index renders the home page with optional error message.
+func (oc *OrderController) Index(w http.ResponseWriter, r *http.Request) {
+	errormsg := r.URL.Query().Get("error")
+	data := IndexPageData{Error: errormsg}
+	oc.Templates.ExecuteTemplate(w, "index.html", data)
+}
+
 // CreatePaymentLink calls the PayOS API, stores the session, and renders the QR page.
 // It no longer issues an HTTP redirect — the webhook is the source of truth for payment.
 func (oc *OrderController) CreatePaymentLink(w http.ResponseWriter, r *http.Request) {
+	// Parse form data
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	mssv := r.FormValue("mssv")
+
+	// Validate MSSV against Google Sheets before creating payment
+	exists, err := gsheets.ExistsMSSV(config.SPREADSHEET_ID, mssv)
+	if err != nil {
+		log.Printf("ERROR: Failed to validate MSSV %s: %v", mssv, err)
+		http.Redirect(w, r, "/?error=System+error.+Please+try+again+later.", http.StatusSeeOther)
+		return
+	}
+	if !exists {
+		http.Redirect(w, r, "/?error=Student+ID+not+found+in+the+list.+Please+check+again.", http.StatusSeeOther)
+		return
+	}
+
+	amount := 2000
+
 	// CRITICAL: The payos-lib-golang has a bug where it unmarshals numbers into float64
 	// and then uses fmt.Sprintf("%v") to build the signature string.
 	// If the number is >= 1,000,000, Go formats it in scientific notation (e.g., 1e+06),
@@ -44,12 +78,12 @@ func (oc *OrderController) CreatePaymentLink(w http.ResponseWriter, r *http.Requ
 
 	body := payos.CheckoutRequestType{
 		OrderCode:   int(orderCode),
-		Amount:      2000,
-		Description: "Thanh toan don hang",
+		Amount:      amount,
+		Description: fmt.Sprintf("%s - Quỹ ITMC", mssv),
 		Items: []payos.Item{
 			{
-				Name:     "My tom Hao Hao ly",
-				Price:    2000,
+				Name:     "Quỹ CLB ITMC",
+				Price:    amount,
 				Quantity: 1,
 			},
 		},
@@ -59,13 +93,13 @@ func (oc *OrderController) CreatePaymentLink(w http.ResponseWriter, r *http.Requ
 
 	data, err := payos.CreatePaymentLink(body)
 	if err != nil {
+		log.Printf("ERROR: Failed to create payment link: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Register the order in the store with PENDING status and the expected amount.
-	// This must happen before rendering so the webhook handler can find the session.
-	oc.Store.Set(orderCode, body.Amount)
+	// Register the order in the store with PENDING status, expected amount, and MSSV.
+	oc.Store.Set(orderCode, body.Amount, mssv)
 
 	pageData := QRPageData{
 		QRText:    data.QRCode,
@@ -124,6 +158,16 @@ func (oc *OrderController) CheckPaymentStatus(w http.ResponseWriter, r *http.Req
 					oc.Store.UpdateStatus(orderCode, store.StatusPaid)
 					status = store.StatusPaid
 					log.Printf("SMART POLLING SUCCESS: Order %d marked as PAID (Direct API)", orderCode)
+
+					// Update Google Sheets automation
+					if ok && session.MSSV != "" {
+						go func() {
+							err := gsheets.MarkAsPaid(config.SPREADSHEET_ID, session.MSSV)
+							if err != nil {
+								log.Printf("ERROR: Failed to update Google Sheets for MSSV %s: %v", session.MSSV, err)
+							}
+						}()
+					}
 				}
 			}
 		}

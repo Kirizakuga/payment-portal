@@ -90,3 +90,4 @@ PayOS stores this permanently. Only redo if your domain changes.
 - [ ] Add authentication to `/admin/confirm-webhook` or remove it post-setup
 - [ ] Add structured logging (e.g., `log/slog`) to replace raw `log.Printf`
 - [ ] Add unit tests for `store/store.go` TTL eviction and `WebhookController` security pipeline
+$note

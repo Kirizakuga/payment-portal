@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"payos-demo/config"
+	"payos-demo/lib/gsheets"
 	"payos-demo/store"
 
 	"github.com/payOSHQ/payos-lib-golang"
@@ -60,12 +62,27 @@ func (wc *WebhookController) VerifyPaymentWebhookData(w http.ResponseWriter, r *
 
 	// Step 3: Race condition safety — the webhook can arrive before CreatePaymentLink
 	// finishes saving the session (especially on fast banking apps).
-	// We never discard a verified payment just because our UI state hasn't caught up.
 	if !found {
-		log.Printf("WARNING: Webhook received for unknown order %d. Possible race condition. Recording payment anyway.", orderCode)
-		// TODO: Push to permanent storage (Google Sheets / DB) with order details.
-		// This is the fallback path for abandoned-tab payments.
-		log.Printf("PAYMENT RECORDED [RACE FALLBACK]: OrderCode=%d, Amount=%d", orderCode, webhookData.Amount)
+		log.Printf("WARNING: Webhook received for unknown order %d. Possible race condition.", orderCode)
+		
+		// Attempt to extract MSSV from description if session is missing
+		// Description format: "2152xxxx - Quỹ ITMC"
+		mssv := ""
+		if len(webhookData.Description) >= 8 {
+			mssv = webhookData.Description[:8] // Basic extraction for 8-digit MSSV
+		}
+
+		wc.Store.UpdateStatus(orderCode, store.StatusPaid)
+		
+		if mssv != "" {
+			go func() {
+				err := gsheets.MarkAsPaid(config.SPREADSHEET_ID, mssv)
+				if err != nil {
+					log.Printf("ERROR: Failed to update Google Sheets (Race Fallback) for MSSV %s: %v", mssv, err)
+				}
+			}()
+		}
+
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -82,11 +99,18 @@ func (wc *WebhookController) VerifyPaymentWebhookData(w http.ResponseWriter, r *
 	}
 
 	// Step 5: All checks passed. This is the source-of-truth write point.
-	// TODO: Replace this log with a real write to Google Sheets / PostgreSQL.
-	// This must be done HERE, not in the frontend success page, so that
-	// payments from closed-tab users are never lost.
-	log.Printf("PAYMENT SUCCESS: OrderCode=%d, Amount=%d VND. [TODO: Write to Google Sheets]", orderCode, webhookData.Amount)
 	wc.Store.UpdateStatus(orderCode, store.StatusPaid)
+	log.Printf("PAYMENT SUCCESS: OrderCode=%d, Amount=%d VND. MSSV=%s", orderCode, webhookData.Amount, session.MSSV)
+
+	// Update Google Sheets automation
+	if session.MSSV != "" {
+		go func() {
+			err := gsheets.MarkAsPaid(config.SPREADSHEET_ID, session.MSSV)
+			if err != nil {
+				log.Printf("ERROR: Failed to update Google Sheets for MSSV %s: %v", session.MSSV, err)
+			}
+		}()
+	}
 
 	w.WriteHeader(http.StatusOK)
 }

@@ -31,9 +31,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Page routes
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "index.html", nil)
-	})
+	http.HandleFunc("/", orderCtrl.Index)
 	http.HandleFunc("/cancel/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl.ExecuteTemplate(w, "cancel.html", nil)
 	})
