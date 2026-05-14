@@ -1,0 +1,9 @@
+.git
+.idea
+.env
+.env.example
+docs/
+scratch/
+*.md
+.antigravityignore
+# google-credentials.json is included for the demo, but should be managed via secrets in production.
