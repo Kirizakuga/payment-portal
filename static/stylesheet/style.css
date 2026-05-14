@@ -1,8 +1,29 @@
+/* =========================================
+   ROOT VARIABLES & GLOBAL STYLES
+   ========================================= */
+:root {
+    --bg-color: #3b4a62;
+    --box-color: #313e55;
+    --primary-txt: #fe9841;
+    --highlight-txt: #bbeae1;
+    --box-highlight-color: #35778f;
+    --error-txt: #ff6b6b; /* NEW: A soft red for error messages */
+}
+
 body {
-    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+}
+
+/* THE BASELINE: Everything gets this font and orange color by default */
+.text, #text {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--primary-txt);
+    margin: 8px 0;
 }
 
 .main-box {
+    background-color: var(--bg-color);
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -10,77 +31,124 @@ body {
     align-items: center;
 }
 
+
+/* =========================================
+   NATURAL OVERRIDES (Using IDs to beat Classes)
+   ========================================= */
+
+/* ID is stronger than .text, so this naturally makes the title bigger */
+#main-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+/* ID overrides .text's orange color with the light blue highlight */
+#success-title {
+    color: var(--highlight-txt);
+    font-size: 1.5rem;
+    text-align: center;
+}
+#success-title {
+    color: var(--highlight-txt);
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+/* NEW: Natural override for the failure title */
+#failed-title {
+    color: var(--error-txt);
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+#support-email {
+    color: var(--highlight-txt);
+}
+
+
+/* =========================================
+   COMPONENTS
+   ========================================= */
 .checkout {
     width: 450px;
-    box-shadow: 0 0 0 1px #6655ff;
-    border-radius: 5px;
+    background-color: var(--box-color);
+    border-radius: 10px;
 }
 
 .product {
-    padding: 6px 10px
+    padding: 15px 20px;
 }
 
 .product p {
     font-size: medium;
 }
 
+/* Button & Link Styles (IDs naturally override .text) */
+#create-payment-link-btn, #return-page-btn {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: var(--box-color);
+    border: 2px dotted var(--highlight-txt);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
 #create-payment-link-btn {
-    width: 100%;
-    height: 36px;
-    background-color: #6655ff;
-    color: white;
-    border: none;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    font-size: medium;
-}
-
-#result {
-    font-family: Arial, Helvetica, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-  }
-  
-#result td, #result th {
-    border: 1px solid #ddd;
-    padding: 8px;
-}
-
-#result tr:nth-child(even){background-color: #f2f2f2;}
-
-#result tr:hover {background-color: #ddd;}
-
-#result th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #6655ff;
-    color: white;
-}
-
-#query-string-table {
-    width: 50%;
-}
-
-.payment-titlte {
-    color: #6655ff;
-    font-size: larger;
+    height: 40px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 #return-page-btn {
-    margin-top: 10px;
-    border: 1px solid #6655ff;
+    width: auto;
+    margin-top: 15px;
+    padding: 10px 20px;
     border-radius: 5px;
-    background-color: #6655ff;
-    padding: 10px 8px;
-    color: white;
-    text-decoration: none;
-    font-size: small;
 }
 
-:root{
-    --bg-color: #3b4a62;
-    --box-color: #313e55;
-    --primary-txt: #fe9841;
-    --highlight-txt: #bbeae1;
+/* Hover States */
+#create-payment-link-btn:hover, #return-page-btn:hover {
+    background-color: var(--box-highlight-color);
+    color: white; /* Naturally overrides the orange text color on hover */
+}
+
+
+/* =========================================
+   📱 MOBILE PHONES (Screens under 600px)
+   ========================================= */
+@media (max-width: 600px) {
+    .checkout { width: 90vw; }
+    .product { padding: 12px 15px; }
+    .text { font-size: 0.95rem; }
+
+    #main-title, #success-title { font-size: 1.2rem; }
+
+    .main-box p { padding: 0 15px; text-align: center; }
+
+    #create-payment-link-btn { height: 48px; font-size: 1rem; }
+    #return-page-btn { padding: 12px 20px; font-size: 1rem; }
+}
+
+
+/* =========================================
+   🖥️ 2K / 4K MONITORS (Screens larger than 1440px)
+   ========================================= */
+@media (min-width: 1440px) {
+    .checkout { width: 650px; border-radius: 12px; }
+    .product { padding: 25px 30px; }
+    .text { font-size: 1.25rem; }
+
+    #main-title, #success-title { font-size: 2rem; }
+
+    #create-payment-link-btn {
+        height: 60px;
+        font-size: 1.3rem;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    #return-page-btn { padding: 16px 30px; font-size: 1.3rem; }
 }
