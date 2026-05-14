@@ -29,3 +29,6 @@ bin/
 
 .env
 .idea/
+
+google-credentials.json
+
