@@ -1,0 +1,29 @@
+# Dependencies
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+node_modules/
+
+# Build
+.next/
+dist/
+build/
+.vercel/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Large files
+*.log
+coverage/
+
+# OS/IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Changelog (agent updates)
+docs/changelog/pending.md
+docs/changelog/history.md
